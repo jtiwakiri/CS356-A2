@@ -2,11 +2,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Timestamp;
 
 /**
  * Class for creating User windows.
  */
-public class UserGUI {
+public class UserGUI implements A2Observer, Comparable<A2Observer> {
     private User user;
     private AdminController admin;
     private JTextField followUserField;
@@ -16,10 +17,13 @@ public class UserGUI {
     private JList<String> followedUsersList;
     private JList<NewsEntry> newsList;
     private JFrame frame;
+    private JLabel creationTime;
+    private JLabel updateTime;
 
     public UserGUI(AdminController admin, User user) {
         this.user = user;
         this.admin = admin;
+        this.user.addObserver(this);
         this.frame = new JFrame("User " + user.getId());
         this.frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
@@ -36,9 +40,12 @@ public class UserGUI {
         createFollowUserComponents();
         createNewsList();
         createFollowedUsersList();
+        createTimeLabels();
         // Panel for buttons
         JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridLayout(4,1));
+        buttonPanel.setLayout(new GridLayout(6,1));
+        buttonPanel.add(creationTime);
+        buttonPanel.add(updateTime);
         buttonPanel.add(followUserField);
         buttonPanel.add(followUserButton);
         buttonPanel.add(postMessageField);
@@ -106,5 +113,23 @@ public class UserGUI {
      */
     private void createNewsList() {
         this.newsList = new JList<NewsEntry>(user.getNewsListModel());
+    }
+
+    private void createTimeLabels() {
+        Timestamp created = new Timestamp(this.user.getCreationTime());
+        Timestamp updated = new Timestamp(this.user.getUpdateTime());
+        this.creationTime = new JLabel("Created:  " + created.toString());
+        this.updateTime = new JLabel("Updated:  " + updated.toString());
+    }
+
+    @Override
+    public void update(A2Subject s) {
+        Timestamp time = new Timestamp(this.user.getUpdateTime());
+        updateTime.setText("Updated:  " + time.toString());
+    }
+
+    @Override
+    public int compareTo(A2Observer o) {
+        return this.hashCode() - o.hashCode();
     }
 }

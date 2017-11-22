@@ -1,3 +1,5 @@
+import jdk.nashorn.internal.scripts.JO;
+
 import javax.swing.*;
 import javax.swing.tree.*;
 import java.awt.*;
@@ -20,6 +22,8 @@ public class AdminControllerGUI {
     private JButton groupTotalButton;
     private JButton messageTotalButton;
     private JButton goodMessageTotalButton;
+    private JButton validateIdButton;
+    private JButton getLastUpdatedButton;
     private JFrame frame;
 
     public AdminControllerGUI(AdminController admin) {
@@ -41,11 +45,13 @@ public class AdminControllerGUI {
         createUserTree();
         createOpenUserViewButton();
         createFunctionButtons();
+        createValidateIdButton();
+        createGetLastUpdatedButton();
         // Add tree to left half of pane
         content.add(this.userTree);
         // Panel for the other half of the main pane
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(9, 1));
+        panel.setLayout(new GridLayout(11, 1));
         panel.add(this.createUserField);
         panel.add(this.createUserButton);
         panel.add(this.createGroupField);
@@ -55,6 +61,8 @@ public class AdminControllerGUI {
         panel.add(this.groupTotalButton);
         panel.add(this.messageTotalButton);
         panel.add(this.goodMessageTotalButton);
+        panel.add(this.validateIdButton);
+        panel.add(this.getLastUpdatedButton);
         content.add(panel);
         // Set visible
         this.frame.pack();
@@ -136,10 +144,30 @@ public class AdminControllerGUI {
         });
     }
 
+    private void createValidateIdButton() {
+        this.validateIdButton = new JButton("Validate IDs");
+        this.validateIdButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                validateIds();
+            }
+        });
+    }
+
+    private void createGetLastUpdatedButton() {
+        this.getLastUpdatedButton = new JButton("Get Last Updated User");
+        this.getLastUpdatedButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                lastUpdated();
+            }
+        });
+    }
+
     /**
      * Creates a new User.  Adds a new User to the AdminController and adds a new node to the JTree in the gui object.
      */
-    public void createUser() {
+    private void createUser() {
         // If there is no selection or a User is selected, add to the root Group
         Group selectedGroup = admin.getGroup("root");
         TreePath selectedPath = userTree.getSelectionPath();
@@ -220,7 +248,7 @@ public class AdminControllerGUI {
     /**
      * Displays the number of users.
      */
-    public void showUserTotal() {
+    private void showUserTotal() {
         String message = "User total:  " + this.admin.userTotal();
         JOptionPane.showMessageDialog(this.frame, message, "User Total", JOptionPane.PLAIN_MESSAGE);
     }
@@ -228,7 +256,7 @@ public class AdminControllerGUI {
     /**
      * Displays the number of groups.
      */
-    public void showGroupTotal() {
+    private void showGroupTotal() {
         String message = "Group total:  " + this.admin.groupTotal();
         JOptionPane.showMessageDialog(this.frame, message, "Group Total", JOptionPane.PLAIN_MESSAGE);
     }
@@ -236,7 +264,7 @@ public class AdminControllerGUI {
     /**
      * Displays the number of messages.
      */
-    public void showMessageTotal() {
+    private void showMessageTotal() {
         String message = "Message total:  " + this.admin.messageTotal();
         JOptionPane.showMessageDialog(this.frame, message, "Message Total", JOptionPane.PLAIN_MESSAGE);
     }
@@ -244,7 +272,7 @@ public class AdminControllerGUI {
     /**
      * Display the number of messages with "good" in them.
      */
-    public void showGoodMessageTotal() {
+    private void showGoodMessageTotal() {
         String message = "Good message total:  " + this.admin.goodMessageTotal();
         JOptionPane.showMessageDialog(this.frame, message, "Good Message Total", JOptionPane.PLAIN_MESSAGE);
     }
@@ -295,7 +323,7 @@ public class AdminControllerGUI {
      * @param a
      * @return
      */
-    public static DefaultMutableTreeNode getMutableTreeNode(A2Component a) {
+    private static DefaultMutableTreeNode getMutableTreeNode(A2Component a) {
         if (a instanceof User) {
             return new DefaultMutableTreeNode(a, false);
         } else if (a instanceof Group) {
@@ -307,6 +335,22 @@ public class AdminControllerGUI {
         } else {
             return null;
         }
+    }
+
+    private void validateIds() {
+        boolean valid = this.admin.validateIDs();
+        String message = null;
+        if (valid) {
+            message = "All IDs are valid.";
+        } else {
+            message = "Not all IDs are valid.";
+        }
+        JOptionPane.showMessageDialog(this.frame, message, "Validation Result", JOptionPane.PLAIN_MESSAGE);
+    }
+
+    private void lastUpdated() {
+        String message = admin.getLastUpdatedUserId();
+        JOptionPane.showMessageDialog(this.frame, message, "Last Updated User", JOptionPane.PLAIN_MESSAGE);
     }
 
     public JTree getUserTree() {

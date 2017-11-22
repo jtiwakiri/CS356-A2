@@ -3,4 +3,6 @@
  */
 public interface A2Component extends Comparable<A2Component> {
     public void accept(A2Visitor a);
+
+    public String getId();
 }

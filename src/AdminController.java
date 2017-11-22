@@ -108,6 +108,18 @@ public class AdminController {
         return counter.getPositiveTotal();
     }
 
+    public boolean validateIDs() {
+        A2IDValidationVisitor validate = new A2IDValidationVisitor();
+        this.root.accept(validate);
+        return validate.isValid();
+    }
+
+    public String getLastUpdatedUserId() {
+        A2LastUpdatedVisitor last = new A2LastUpdatedVisitor();
+        this.root.accept(last);
+        return last.getLastUpdated().getId();
+    }
+
     public User getUser(String id) {
         return users.get(id);
     }

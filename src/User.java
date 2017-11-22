@@ -10,6 +10,8 @@ public class User implements A2Subject, A2Observer, A2Component {
     private List<String> posts;
     private ListModel<NewsEntry> news;
     private Set<A2Observer> usersFollowing;
+    private long creationTime;
+    private long updateTime;
 
     public User(String id) {
         this.id = id;
@@ -17,6 +19,8 @@ public class User implements A2Subject, A2Observer, A2Component {
         this.posts = new LinkedList<String>();
         this.news = new DefaultListModel<NewsEntry>();
         this.usersFollowing = new  TreeSet<A2Observer>();
+        this.creationTime = System.currentTimeMillis();
+        this.updateTime = this.creationTime;
     }
 
     /**
@@ -25,6 +29,7 @@ public class User implements A2Subject, A2Observer, A2Component {
      */
     public void addPost(String post) {
         ((List<String>) this.posts).add(post);
+        this.updateTime = System.currentTimeMillis();
         this.notifyObservers();
     }
 
@@ -43,6 +48,7 @@ public class User implements A2Subject, A2Observer, A2Component {
             User followedUser = ((User) s);
             String newestPost = ((User) s).getLastPost();
             ((DefaultListModel<NewsEntry>) this.news).addElement(new NewsEntry(followedUser, newestPost));
+            this.updateTime = System.currentTimeMillis();
         }
     }
 
@@ -58,6 +64,11 @@ public class User implements A2Subject, A2Observer, A2Component {
 
     @Override
     public int compareTo(A2Component o) {
+        return this.hashCode() - o.hashCode();
+    }
+
+    @Override
+    public int compareTo(A2Observer o) {
         return this.hashCode() - o.hashCode();
     }
 
@@ -95,4 +106,11 @@ public class User implements A2Subject, A2Observer, A2Component {
         return this.news;
     }
 
+    public long getCreationTime() {
+        return this.creationTime;
+    }
+
+    public long getUpdateTime() {
+        return this.updateTime;
+    }
 }
